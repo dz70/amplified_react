@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Amplify, API, graphqlOperation } from 'aws-amplify'
 import { createTodo, updateTodo } from './graphql/mutations'
 import { listTodos } from './graphql/queries'
+import { newOnUpdateTodo } from './graphql/subscriptions'
 import awsExports from './aws-exports'
 Amplify.configure( awsExports )
 
@@ -9,9 +10,30 @@ const initialState = { name: '', description: '', isDone: false }
 function App() {
   const [ formState, setFormState ] = useState( initialState )
   const [ todos, setTodos ] = useState([])
+  const [ updatedTodo, setUpdatedTodo ] = useState([])
+  let subOnUpdate
+  // useEffect for fetching ToDo's from Dynamo
   useEffect(() => {
     fetchTodos()
   }, [ todos ])
+  // useEffect for subscription
+  useEffect(() => {
+    setUpSubscription()
+    return () => {
+      subOnUpdate.unsubscribe()
+    }
+  }, [])
+  // Function that inits subscription listeners
+  function setUpSubscription() {
+    subOnUpdate = API.graphql(
+      graphqlOperation( newOnUpdateTodo ))
+        .subscribe({
+          next: ( data ) => {
+            console.log({ data })
+            setUpdatedTodo( data )
+          }
+        })
+  }
   function setInput( key, value ) {
     setFormState({ ...formState, [ key ]: value })
   }
