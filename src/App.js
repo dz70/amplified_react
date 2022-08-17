@@ -10,7 +10,7 @@ const initialState = { name: '', description: '', isDone: false }
 function App() {
   const [ formState, setFormState ] = useState( initialState )
   const [ todos, setTodos ] = useState([])
-  const [ updatedTodo, setUpdatedTodo ] = useState([])
+  // const [ updatedTodo, setUpdatedTodo ] = useState([])
   let subOnUpdate
   // useEffect for fetching ToDo's from Dynamo
   useEffect(() => {
@@ -29,8 +29,8 @@ function App() {
       graphqlOperation( newOnUpdateTodo ))
         .subscribe({
           next: ( data ) => {
-            console.log({ data })
-            setUpdatedTodo( data )
+            console.log('SUBSCRIBPTION EVENT DATA RECEIVED ::::: ', { data })
+            // setUpdatedTodo( data )
           }
         })
   }
